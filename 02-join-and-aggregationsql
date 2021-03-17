@@ -74,7 +74,7 @@ where j.job_id = 'AD_ASST' and salary between j.min_salary and j.max_salary;
 -----------------
 --조건 만족하는 짱이 없는 튜플동 null을 포함 해서 출력 시키는 join
 --모든 레코드를 출력할 테이블의 위치에 따라서 left ,right, full oter join
---oracle 경우 null아닌 쪽에 (+) 붙임
+--oracle 경우 null 쪽에 (+) 붙임
 
 --왼쪽 아웃 조인 oracle 버전
 select first_name,
