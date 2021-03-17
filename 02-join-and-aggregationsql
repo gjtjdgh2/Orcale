@@ -1,0 +1,136 @@
+-------
+---join
+-------
+
+desc employees;
+desc departments;
+
+--두 테이블 모두 불러 올 경우
+--cross join:카티전 프로덕트
+--두 테이블의 조합 가능한 모든 레코드의 쌍
+select employees.employee_id,employees.department_id,
+departments.department_id,departments.department_name
+from employees,departments;
+
+--일반적으로는 이런 결과를 원하지 않을것
+--첫번째 테이블의 departments_ID 와 두번쨰 테이블 departments_ID 일치
+select employees.employee_id,employees.first_name,employees.department_id,
+departments.department_id,departments.department_name
+from employees,departments
+where employees.department_id = departments.department_id;
+
+--inner join, equi join
+
+--컬럼명의 모호성을 피하기 위해서 테이블명.컬럼명
+--테이블 별명(alias)를 붙여서 관리
+select employee_id,first_name,--컬럼 명이 소속이 명확하면 테이블명 적을 필요 없다
+emp.department_id,
+dep.department_id,
+department_name
+from employees emp,departments dep --별칭을 부여함
+where emp.department_id = dep.department_id;
+
+select * from employees; --107개
+
+select first_name,emp.department_id,dep.department_id,dep.department_name
+from employees emp,departments dep
+where emp.department_id=dep.department_id;--106개
+
+--join되지 않은 사원은 누구 인가?
+select first_name,department_id
+from employees
+where department_id is null;
+
+select first_name, department_id,
+department_name
+from employees emp join departments
+using(department_id); --join할 컬럼을 명시
+
+--join on
+select first_name,
+emp.department_id,
+department_name
+from employees emp join departments dep
+    on(emp.department_id = dep.department_id);--on은 join문의 where 이다
+
+--natural join
+--두 테이블에 조인을 할 수  있는 공통 필드가 있을 경우(공통 필드가 명확할때)
+select first_name,
+department_id,
+department_name
+from employees natural join departments;
+
+----------
+--theta join
+----------
+--임의의 조건을 사용하되 join 조건이 = 조건이 아닌경우
+select *from jobs where job_id ='AD_ASST';
+
+select first_name,salary from employees emp, jobs j
+where j.job_id = 'AD_ASST' and salary between j.min_salary and j.max_salary;
+
+-----------------
+--outer join
+-----------------
+--조건 만족하는 짱이 없는 튜플동 null을 포함 해서 출력 시키는 join
+--모든 레코드를 출력할 테이블의 위치에 따라서 left ,right, full oter join
+--oracle 경우 null아닌 쪽에 (+) 붙임
+
+--왼쪽 아웃 조인 oracle 버전
+select first_name,
+emp.department_id,
+dep.department_id,
+department_name
+from employees emp,departments dep
+where emp.department_id = dep.department_id(+);--왼쪽 아웃 조인
+
+--왼쪽 아웃 조인 ansl sql
+select first_name,
+emp.department_id,
+dep.department_id,
+department_name
+from employees emp left outer join departments dep --emp 테이블은 모두 참여
+on emp.department_id =  dep.department_id;
+
+
+--오른쪽 아웃 조인 oracle 버전
+select first_name,
+emp.department_id,
+dep.department_id,
+department_name
+from employees emp,departments dep
+where emp.department_id(+) = dep.department_id;
+
+
+--오른쪽 아웃 조인 ansl sql
+select first_name,
+emp.department_id,
+dep.department_id,
+department_name
+from employees emp right outer join departments dep --dep 테이블은 모두 참여
+on emp.department_id =  dep.department_id;
+
+--full outer join
+select first_name,
+emp.department_id,
+dep.department_id,
+department_name
+from employees emp full outer join departments dep --테이블은 모두 참여
+on emp.department_id =  dep.department_id;
+
+--self join 자신의 pk와 자신의 fk를 조인
+desc employees;
+--자신을 주번 호칭 하므로 alias 사용 할수 밖에 없는 join
+select emp.employee_id,emp.first_name,--사원 정보
+emp.manager_id,
+man.first_name
+from employees emp,employees man
+where emp.manager_id=man.employee_id;
+
+
+--ansi sql
+select emp.employee_id,emp.first_name,
+emp.manager_id,
+man.first_name
+from employees emp join employees man
+on emp.manager_id=man.employee_id;
