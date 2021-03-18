@@ -14,6 +14,12 @@ select employee_id,first_name,salary,department_name,job_title
 from employees emp, jobs j, departments dep
 where emp.job_id= j.job_id and emp.department_id = dep.department_id (+)
 order by employee_id;
+--ansi sql
+select employee_id,first_name,salary,department_name,job_title
+from employees emp left outer join departments dep
+on emp.department_id = dep.department_id ,jobs j
+where emp.job_id= j.job_id ;
+
 --문제3
 select dep.location_id,city,department_name,department_id
 from departments dep , locations lo
@@ -24,6 +30,11 @@ select dep.location_id,city,department_name,department_id
 from departments dep , locations lo
 where   dep.location_id(+)=lo.location_id
 order by dep.location_id;
+--==
+select dep.location_id,city,department_name,department_id
+from locations lo left outer join departments dep
+on   dep.location_id=lo.location_id
+order by dep.location_id;
 --문제4
 select region_name,country_name
 from regions reg natural join countries coun
@@ -33,7 +44,7 @@ order by region_name,country_name desc;
 select emp.employee_id, emp.first_name, emp.hire_date, 
 man.first_name, man.hire_date
 from  employees emp,employees man
-where emp.hire_date > man.hire_date and emp.employee_id=man.manager_id;
+where emp.hire_date < man.hire_date and emp.employee_id=man.manager_id;
 --문제6
 select country_name,coun.country_id, city,lo.location_id,
 dep.department_name,dep.department_id
