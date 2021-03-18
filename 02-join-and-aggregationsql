@@ -207,3 +207,66 @@ select department_id,job_id ,sum(salary)
 from employees
 group by cube(department_id,job_id)
 order by department_id;
+
+----------------------
+---subquery
+----------------------
+--서브 커리는 결과가 단일 행인 경우만 사용 가능
+--하나의 sql이 다른 sql 질의의 일부에 포함 되는경우
+--den이 얼마나 급ㅇ를 받는지 -a
+--a보다 많은 급여를 받는 사람은?
+select salary from employees where first_name ='Den';
+select first_name,salary from employees where salary> (
+select salary from employees where first_name ='Den');
+
+
+--연습 
+--급여의 중앙값보다 많이 받는 직원
+-- 급여 중앙값?
+--급여를 중앙값보다 많이 받는 직원
+select median(salary) from employees;
+select first_name,salary from employees where salary>(
+select median(salary) from employees);
+
+--급여를 가장 적게 받는 사람 이름,급여 사원 번호
+select min(salary) from employees;
+select first_name salary,employee_id
+from employees
+where salary='2100';
+
+select first_name ,salary,employee_id
+from employees
+where salary=(select min(salary) from employees);
+
+--다중행 서브 커리
+--서브 커리 결과 레코득 둘 이상인 경우, 단순 비교 불가능
+
+--110번 부서의 직원이 받는 급여는? in은 or 과 같다
+select first_name ,salary
+from employees
+where salary in (select salary from employees -- = < >등  은 못쓴다
+where department_id = 110);
+
+-- =any 은 or 과 같다
+select first_name ,salary
+from employees
+where salary = any (select salary from employees 
+where department_id = 110);
+
+--all 은 and 와 같다
+select first_name ,salary
+from employees
+where salary >all (select salary from employees 
+where department_id = 110);
+
+select first_name, salary from employees
+where salary > any (select salary from employees 
+where department_id = 110);
+
+
+--correlated query
+--포함한 쿼리(outer query) 포함된 커리 (inner query) 서로 연관 관계
+select first_name,salary,department_id
+from employees outer
+where salary > (select avg(salary) from employees where 
+department_id = outer.department_id);
