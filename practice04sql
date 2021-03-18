@@ -1,0 +1,28 @@
+--문제1
+select count(salary)
+from employees
+where salary < (select avg(salary)
+    from employees);
+--문제2
+select emp.employee_id, emp.first_name,emp.salary,avg(salary),jobs.max_salary
+from employees emp , jobs
+
+
+--문제3
+select location_id, street_address, postal_code, city, state_province,
+country_id
+from locations lo,departments dep,employees
+where  department_id in (
+select department_id from employees,departments where first_name='Steven' and
+last_name='king');
+--문제4
+
+--문제5
+
+--문제6
+
+--문제7
+
+--문제8
+
+
