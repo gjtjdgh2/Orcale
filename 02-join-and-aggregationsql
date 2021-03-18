@@ -270,3 +270,109 @@ select first_name,salary,department_id
 from employees outer
 where salary > (select avg(salary) from employees where 
 department_id = outer.department_id);
+
+--각 부서 별로 최고 급여 받는 사원 출력
+select department_id , max(salary)
+from employees
+group by department_id;
+
+select department_id,employee_id,first_name,salary
+from employees
+where (department_id,salary) in (select department_id , max(salary)
+from employees
+group by department_id);
+--subquery 임시 테이블 생성
+--부서별 최고 급여 테이블을 임시로 생성 해서 테이블 과 조인하는 방법
+select emp.department_id ,employee_id,first_name, emp.salary
+from employees emp ,(select department_id ,max(salary) salary
+from employees
+group by department_id) sal -- 임시 테이블
+where emp.department_id= sal.department_id and emp.salary = sal.salary
+order by emp.department_id;
+
+--correlated query 활용
+select emp.department_id ,employee_id,first_name, emp.salary
+from employees emp
+where emp.salary = (select max(salary) salary
+from employees
+where department_id=emp.department_id)
+order by emp.department_id;
+
+
+------------------
+--top k query
+------------------
+--오라클 은 질의 수행 경과의 행ㅂㄴ호를 확인 할수 있다 가상 커럼 제공
+
+--2007년 입사자 중에서 급여 순위가 5위까지 추출
+select ROWNUM,first_name,salary
+from employees;
+
+select ROWNUM,first_name,salary
+from employees
+where hire_date like '07%' and rownum <=5;
+
+select ROWNUM,first_name,salary
+from employees
+where hire_date like '07%' and rownum <=5
+order by salary desc; -- rownum 이 정해진 이후 정렬을 함
+
+--top k 쿼리
+select ROWNUM,first_name,salary
+from(select * from employees
+where hire_date like '07%'
+order by salary desc)
+where rownum <=5;
+--set 집 합
+--union(합집합: 중복 제거) union all 합집합 중복 제거 안함
+
+--intersect 교집합  minus 차집합
+select first_name , salary, hire_date from employees where hire_date<'05/01/01';
+select first_name , salary, hire_date from employees where salary> 12000;
+
+select first_name , salary, hire_date from employees where hire_date<'05/01/01'
+intersect
+select first_name , salary, hire_date from employees where salary> 12000;
+
+--위하고 같음
+select first_name , salary, hire_date from employees where hire_date<'05/01/01'
+and salary> 12000;
+
+--union
+select first_name , salary, hire_date from employees where hire_date<'05/01/01'
+union
+select first_name , salary, hire_date from employees where salary> 12000;
+--위하고 같음
+select first_name , salary, hire_date from employees where hire_date<'05/01/01'
+or salary> 12000;
+
+--차집합 minus
+select first_name , salary, hire_date from employees where hire_date<'05/01/01'
+minus
+select first_name , salary, hire_date from employees where salary> 12000;
+
+--입사일이 05/01/01 이전인 사람들중 급여가 12000 이하인 사람들
+select first_name,salary, hire_date
+from employees
+where hire_date<'05/01/01' and
+not(salary> 12000);
+
+--rank 함수
+select salary,first_name , rank() over (order by salary desc) as rank,--중복된 순위 건너
+--뛰고 순위 부여
+dense_rank() over(order by salary desc) as dense_rank,--중복순위 상관없이 다음 순위 부여
+row_number() over(order by salary desc) as row_number,--중복 상관없이 차레 대로 부여
+rownum --정렬 되기 이전의 레코드 순서
+from employees;
+
+--hierarchical query 트리 형태의 구조를 추출
+--root 노드 시작 위치로 설정
+--가지  연결 하기 위한 조건을 connect by prior 로 설정
+--employees 조직도 그려 보기
+select level, first_name,employee_id
+from employees
+start WITH manager_id is null --root 노드 조건
+CONNECT by prior employee_id = manager_id
+order by level;
+
+--연습문제: 위 트리 구조에 매니저의 이름도 출력 해 주세여
