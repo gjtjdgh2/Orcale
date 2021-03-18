@@ -1,0 +1,57 @@
+--system 으로 진행
+--user_users 현재 사용자 관련 정보
+--all_users db의 모든 사용자 정보
+--dba_users 모든 사용자 상세 정보
+
+--현재 사용자 정보
+select * from user_users;
+--전체 사용자 확인
+select * from all_users;
+
+
+--로그인 권한 부여
+grant create session to c##gjtjdgh; --c##gjtjdgh 에게 세션 생성 권안 부여
+--create table test( a number);
+--권한이 없어서 안 만드러짐
+
+grant connect, resource to c##gjtjdgh;
+
+/*
+보충 설명
+오라클 12이후 
+    일반 계정 구분을 위해서 일반 계정 앞에응 C##을 붙임
+    실제  데이터가 저장된 테이블 스페이스를 줘야 한다  users 테이블 스페이스에
+    공간을 만들어 줘야 한다
+*/
+
+/* c## 없이 계정 생성 방법 */
+alter session set"_oracle_script" = true;
+create user gjtjdgh identified by 1234;
+-- 사용자 데이터 저장 테이블 스페이스 부여
+alter user c##gjtjdgh default tablespace users
+    quota unlimited on users; --저장 공간 한도
+
+--role의 생성
+drop role dbuser;
+create role dbuser; -- dbuser 역활을 만들어서 여러개의 권한을 담을수 있다
+grant create table to dbuser;--dbuser역활에 접소할수 있는 권한 부여
+grant resource to dbuser;--dbuser 역활에 자원 생성 권한 부여
+
+--role을 grant 하면 내부에 있는 개별 권한이 모두 부여
+grant dbuser to gjtjdgh; -- gjtjdgh 에 dbuser 역활부여
+
+revoke dbuser from gjtjdgh; --gjtjdgh 부터 dbuser 역활 회수
+--계정 삭제 
+drop user gjtjdgh cascade;
+
+--권한의 확인
+select * from role_sys_privs;
+
+show user;
+--현재 사용자에게 부여된 role 확인
+select * from user_role_privs;
+
+--connect 역활은 어떤 권한이 포함 되어 있는가
+desc role_sys_privs;
+select * from role_sys_privs;
+
