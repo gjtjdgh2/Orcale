@@ -183,3 +183,27 @@ from employees
 group by department_id--그룹핑
 having avg(salary) >= 7000 --having 은 group by 뒤에 쓰임
 order by department_id;
+
+
+--rollup
+--group by 절과 같이 사용
+--group by 의 결과에 좀더 상세한 요약을 제공 가능
+--부서별 급여의 합계 추출 (부서 아이디,job_id)
+select department_id,job_id,sum(salary)
+from employees
+group by department_id,job_id
+order by department_id;
+
+select department_id,job_id,sum(salary)
+from employees
+group by rollup(department_id,job_id)
+order by department_id;
+
+--cube 함수
+--crosstable 에 대한  summar를 제공
+--rollup 함수로 추출된 subotal에
+--column total 값을 추출 할 수 있다
+select department_id,job_id ,sum(salary)
+from employees
+group by cube(department_id,job_id)
+order by department_id;
