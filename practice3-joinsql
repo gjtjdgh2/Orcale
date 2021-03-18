@@ -62,9 +62,10 @@ city, country_name,region_name
 from employees emp,departments dep, countries coun ,locations lo,
 regions re
 where  emp.department_id=dep.department_id and dep.location_id=lo.location_id
-and lo.country_id = coun.country_id and coun.region_id = re.region_id and 
-emp.manager_id=dep.manager_id;
+and lo.country_id = coun.country_id and coun.region_id = re.region_id ;
 
 --문제9
-select employee_id,first_name,department_name,first_name
-from employees emp,departments dep
+select emp.employee_id,emp.first_name,dep.department_name,man.first_name
+from employees emp,departments dep,employees man
+where emp.department_id = dep.department_id(+) and 
+emp.manager_id = man.manager_id;
