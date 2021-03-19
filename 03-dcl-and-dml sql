@@ -18,6 +18,7 @@
 SELECT * FROM USER_USERS;
 --  전체 사용자 확인
 SELECT * FROM ALL_USERS;
+CREATE USER C##gjtjdgh IDENTIFIED BY 1234;
 
 -- 로그인 권한 부여
 GRANT create session TO C##gjtjdgh;   --  C##gjtjdgh에게 세션 생성(로그인) 권한을 부여
@@ -44,7 +45,7 @@ Oracle 12이후
 */
 /* C## 없이 계정을 생성하는 방법 - 팁 */
 ALTER SESSION SET "_ORACLE_SCRIPT" = true;
-CREATE USER gjtjdgh IDENTIFIED BY 1234;
+CREATE USER gjtjdgh2 IDENTIFIED BY 1234;
 /* 사용자 데이터 저장 테이블 스페이스 부여 */
 ALTER USER C##gjtjdgh DEFAULT TABLESPACE USERS    -- C##gjtjdgh 사용자의 저장 공간을 USERS에 마련
     QUOTA unlimited ON USERS;   --  저장 공간 한도를 무한으로 부여
@@ -56,12 +57,12 @@ GRANT create session TO dbuser;   --  dbuser 역할에 접속할 수 있는 권�
 GRANT resource TO dbuser;       --  dbuser 역할에 자원 생성 권한을 부여
 
 -- ROLE을 GRANT 하면 내부에 있는 개별 Privilege(권한)이 모두 부여
-GRANT dbuser TO gjtjdgh;      --  gjtjdgh 사용자에게 dbuser 역할을 부여
+GRANT dbuser TO gjtjdgh2;      --  gjtjdgh2 사용자에게 dbuser 역할을 부여
 -- 권한의 회수 REVOKE 
-REVOKE dbuser FROM gjtjdgh;   --  gjtjdgh 사용자로부터 dbuser 역할을 회수
+REVOKE dbuser FROM gjtjdgh2;   --  gjtjdgh2 사용자로부터 dbuser 역할을 회수
 
 -- 계정 삭제
-DROP USER gjtjdgh CASCADE;
+DROP USER gjtjdgh2 CASCADE;
 
 -- 현재 사용자에게 부여된 ROLE 확인
 -- 사용자 계정으로 로그인
