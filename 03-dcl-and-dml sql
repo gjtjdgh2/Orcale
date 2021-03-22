@@ -52,12 +52,12 @@ ALTER USER C##gjtjdgh DEFAULT TABLESPACE USERS    -- C##gjtjdgh 사용자의 저
 
 -- ROLE의 생성
 DROP ROLE dbuser;
-CREATE ROLE dbusere; --  dbusere 역할을 만들어 여러개의 권한을 담아둔다
-GRANT create session TO dbusere;   --  dbusere 역할에 접속할 수 있는 권한을 부여
-GRANT resource TO dbusere;       --  dbusere 역할에 자원 생성 권한을 부여
+CREATE ROLE dbuser; --  dbuser 역할을 만들어 여러개의 권한을 담아둔다
+GRANT create session TO dbuser;   --  dbuser 역할에 접속할 수 있는 권한을 부여
+GRANT resource TO dbuser;       --  dbuser 역할에 자원 생성 권한을 부여
 
 -- ROLE을 GRANT 하면 내부에 있는 개별 Privilege(권한)이 모두 부여
-GRANT dbuser TO gjtjdgh2;      --  gjtjdgh2 사용자에게 dbuser 역할을 부여
+GRANT dbuser TO C##gjtjdgh ;      --  C##gjtjdgh  사용자에게 dbuser 역할을 부여
 -- 권한의 회수 REVOKE 
 REVOKE dbuser FROM gjtjdgh2;   --  gjtjdgh2 사용자로부터 dbuser 역할을 회수
 
@@ -99,7 +99,7 @@ SELECT * FROM hr.employees WHERE job_id like 'IT_%';
 CREATE TABLE it_emps AS (
     SELECT * FROM hr.employees WHERE job_id like 'IT_%'
 );
-
+ 
 SELECT * FROM it_emps;
 CREATE TABLE emp_summary AS (
     SELECT employee_id, 
