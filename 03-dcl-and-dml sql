@@ -52,9 +52,9 @@ ALTER USER C##gjtjdgh DEFAULT TABLESPACE USERS    -- C##gjtjdgh 사용자의 저
 
 -- ROLE의 생성
 DROP ROLE dbuser;
-CREATE ROLE dbuser; --  dbuser 역할을 만들어 여러개의 권한을 담아둔다
-GRANT create session TO dbuser;   --  dbuser 역할에 접속할 수 있는 권한을 부여
-GRANT resource TO dbuser;       --  dbuser 역할에 자원 생성 권한을 부여
+CREATE ROLE dbusere; --  dbusere 역할을 만들어 여러개의 권한을 담아둔다
+GRANT create session TO dbusere;   --  dbusere 역할에 접속할 수 있는 권한을 부여
+GRANT resource TO dbusere;       --  dbusere 역할에 자원 생성 권한을 부여
 
 -- ROLE을 GRANT 하면 내부에 있는 개별 Privilege(권한)이 모두 부여
 GRANT dbuser TO gjtjdgh2;      --  gjtjdgh2 사용자에게 dbuser 역할을 부여
@@ -82,3 +82,99 @@ GRANT SELECT ON hr.employees TO C##gjtjdgh;
 -- C##gjtjdgh로 진행
 SHOW USER;
 SELECT * FROM hr.employees; --  hr.employees의 SELECT 권한을 부여받았으므로 테이블 조회 가능
+
+-- CREATE TABLE
+CREATE TABLE book ( -- 컬럼 명세
+    book_id NUMBER(5),  --  5자리 숫자
+    title VARCHAR2(50), --  50글자 가변문자
+    author VARCHAR2(10),    -- 10글자 가변문자열
+    pub_date DATE DEFAULT SYSDATE   -- 기본값은 현재시간
+);
+DESC book;
+
+-- 서브쿼리를 활용한 테이블 생성
+-- hr.employees 테이블을 기반으로 일부 데이터를 추출
+--  새 테이블
+SELECT * FROM hr.employees WHERE job_id like 'IT_%';
+CREATE TABLE it_emps AS (
+    SELECT * FROM hr.employees WHERE job_id like 'IT_%'
+);
+
+SELECT * FROM it_emps;
+CREATE TABLE emp_summary AS (
+    SELECT employee_id, 
+        first_name || ' ' || last_name full_name,
+        hire_date, salary
+    FROM hr.employees
+);
+DESC emp_summary;
+SELECT * FROM emp_summary;
+
+-- author 테이블 
+DESC book;
+CREATE TABLE author (
+    author_id NUMBER(10),
+    author_name VARCHAR2(100) NOT NULL, -- NULL일 수 없다
+    author_desc VARCHAR2(500),
+    PRIMARY KEY (author_id) -- author_id 컬럼을 PK로
+);
+DESC author;
+
+-- book테이블에 author 테이블 연결을 위해
+-- book 테이블의 author 컬럼을 삭제: DROP COLUMN
+ALTER TABLE book
+DROP COLUMN author;
+DESC book;
+
+-- author테이블 참조를 위한 author_id 컬럼을 book에 추가
+ALTER TABLE book
+ADD (author_id NUMBER(10));
+DESC book;
+
+-- book 테이블의 PK로 사용할 book_id도 NUMBER(10)으로 변경
+ALTER TABLE book
+MODIFY (book_id NUMBER(10));
+DESC book;
+
+-- 제약조건의 추가: ADD CONSTRAINT
+-- book 테이블의 book_id를 PRIMARY KEY 제약조건 부여
+ALTER TABLE book
+ADD CONSTRAINT pk_book_id PRIMARY KEY(book_id);
+DESC book;
+
+-- FOREIGN KEY 추가
+-- book 테이블의 author_id가 author의 author_id를 참조
+ALTER TABLE book
+ADD CONSTRAINT
+    fk_author_id FOREIGN KEY (author_id)
+        REFERENCES author(author_id);
+DESC book;
+
+-- COMMENT
+COMMENT ON TABLE book IS 'Book Information';
+COMMENT ON TABLE author IS 'Author Information';
+
+-- 테이블 커멘트 확인
+SELECT * FROM user_tab_comments;
+SELECT comments FROM user_tab_comments 
+WHERE table_name='BOOK';
+
+--  Data Dictionary
+-- Oracle은 내부에서 발생하는 모든 정로를 Data Dictionary에 담아두고 있다
+--  계정별로 USER_(일반 사용자), ALL_(전체 사용자), DBA_(관리자 전용) 접근 범위를 제한함
+-- 모든 딕셔너리 확인
+SHOW user;
+SELECT * FROM dictionary;
+
+-- DBA_ 딕셔너리 확인
+-- dba로 로그인 필요 as sysdba
+
+-- 사용자 DB 객체 dictionary USER_OBJECTS
+SELECT * FROM user_objects;
+SELECT object_name, object_type FROM user_objects;
+SELECT * FROM user_objects WHERE OBJECT_NAME='BOOK';
+
+-- 제약조건 확인 dictionary USER_CONSTRAINTS
+SELECT * FROM user_constraints;
+-- 제약조건이 걸린 컬럼 확인
+SELECT * FROM user_cons_columns;
