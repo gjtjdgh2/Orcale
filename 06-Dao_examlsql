@@ -1,0 +1,31 @@
+--DAO 객체 생성 연습
+--사용자 계정 접속
+desc author;
+
+select * from author;
+drop table author cascade constraints;
+drop table book;
+
+select * from user_objects;
+drop sequence seq_author_id;
+
+create table author(
+id number(10),
+name varchar2(50) not null,
+bio varchar2(100),
+primary key (id)
+);
+
+create sequence seq_author
+start with 1
+increment by 1
+maxvalue 100000;
+
+select * from user_objects;
+
+insert into author
+values(seq_author.nextval,
+'박결리','토지작가');
+select * from author;
+commit;
+

@@ -1,0 +1,14 @@
+create table PHONE_BOOK(
+id number(10) primary key,
+name varchar2(10),
+hp varchar2(20),
+tel varchar2(20)
+);
+
+create sequence seq_phone_book;
+
+insert into phone_book
+values( seq_phone_book.nextval,'엠씨길','010-5856-3854','02-932-8525');
+
+select * from phone_book;
+commit;
